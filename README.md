@@ -7,10 +7,15 @@ Zero dependencies — just Node.js 18+ (developed on 22).
 npm start          # http://localhost:3100   (PORT=… to change)
 ```
 
-**First run:** an administrator account is created. By default it is `admin` with a one-time password printed in
-the console, which you must change at first sign-in. To choose your own login instead (e.g. for testing), set
-`ADMIN_USERNAME` and `ADMIN_PASSWORD` (min 8 chars) before the **first** start — they only apply when `data/db.json`
-has no users yet, and are never stored in git:
+**First run:** when `data/db.json` has no users, an administrator account is created:
+
+| Username | Password |
+| --- | --- |
+| `admin` | `Admin@12345` |
+
+This default is public (it is in this repository), so you are **forced to change the password at first sign-in** — do
+that straight away, and don't deploy to the internet with real data until you have. To choose a different first login
+instead, set `ADMIN_USERNAME` and `ADMIN_PASSWORD` (min 8 chars) before the **first** start (no forced change then):
 
 ```
 # PowerShell

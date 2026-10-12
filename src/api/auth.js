@@ -6,6 +6,9 @@ const { db, save } = require('../store');
 const { HttpError, bad, str, bool } = require('../http');
 const A = require('../auth');
 
+// Public default login for a brand-new database. Must be changed at first sign-in.
+const DEFAULT_ADMIN = { username: 'admin', password: 'Admin@12345' };
+
 const LISTS = ['departments', 'areas', 'categories', 'breakdownTypes', 'rootCauseCategories'];
 const REQUIRED_LISTS = ['departments', 'categories', 'breakdownTypes', 'rootCauseCategories'];
 
@@ -107,10 +110,12 @@ add('PUT', '/api/settings', A.CAN.admin, ({ body }) => {
 // First run: create the administrator account.
 function seedAdmin() {
   if (db.users.length) return;
-  // Credentials can be chosen at first start via ADMIN_USERNAME / ADMIN_PASSWORD (never commit them).
-  const username = (process.env.ADMIN_USERNAME || 'admin').trim().toLowerCase();
+  // Credentials can be chosen at first start via ADMIN_USERNAME / ADMIN_PASSWORD.
+  // Otherwise a well-known default is used so a fresh deployment can be signed in to. It is public (it is in the
+  // repository), so the first sign-in is forced to change it -- sign in and change it immediately.
+  const username = (process.env.ADMIN_USERNAME || DEFAULT_ADMIN.username).trim().toLowerCase();
   const chosen = !!process.env.ADMIN_PASSWORD;
-  const password = process.env.ADMIN_PASSWORD || crypto.randomBytes(9).toString('base64url');
+  const password = process.env.ADMIN_PASSWORD || DEFAULT_ADMIN.password;
   if (password.length < 8) {
     console.error('ADMIN_PASSWORD must be at least 8 characters.');
     process.exit(1);
@@ -124,8 +129,7 @@ function seedAdmin() {
   if (chosen) {
     console.log(`  Username: ${username}   Password: (the ADMIN_PASSWORD you provided)\n`);
   } else {
-    console.log(`  Username: ${username}   Password: ${password}`);
-    console.log('  You will be asked to change this password at first sign-in.\n');
+    console.log(`  Username: ${username}   Password: ${password}   (default -- public, change it at first sign-in)\n`);
   }
 }
 
