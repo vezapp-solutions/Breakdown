@@ -107,15 +107,26 @@ add('PUT', '/api/settings', A.CAN.admin, ({ body }) => {
 // First run: create the administrator account.
 function seedAdmin() {
   if (db.users.length) return;
+  // Credentials can be chosen at first start via ADMIN_USERNAME / ADMIN_PASSWORD (never commit them).
+  const username = (process.env.ADMIN_USERNAME || 'admin').trim().toLowerCase();
+  const chosen = !!process.env.ADMIN_PASSWORD;
   const password = process.env.ADMIN_PASSWORD || crypto.randomBytes(9).toString('base64url');
+  if (password.length < 8) {
+    console.error('ADMIN_PASSWORD must be at least 8 characters.');
+    process.exit(1);
+  }
   db.users.push({
-    id: crypto.randomUUID(), username: 'admin', name: 'Administrator', role: 'admin', active: true,
-    passwordHash: A.hashPassword(password), mustChangePassword: true, createdAt: new Date().toISOString(),
+    id: crypto.randomUUID(), username, name: 'Administrator', role: 'admin', active: true,
+    passwordHash: A.hashPassword(password), mustChangePassword: !chosen, createdAt: new Date().toISOString(),
   });
   save();
   console.log('\n  First run: administrator account created.');
-  console.log(`  Username: admin   Password: ${password}`);
-  console.log('  You will be asked to change this password at first sign-in.\n');
+  if (chosen) {
+    console.log(`  Username: ${username}   Password: (the ADMIN_PASSWORD you provided)\n`);
+  } else {
+    console.log(`  Username: ${username}   Password: ${password}`);
+    console.log('  You will be asked to change this password at first sign-in.\n');
+  }
 }
 
 module.exports = { seedAdmin };

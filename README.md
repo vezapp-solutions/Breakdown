@@ -7,8 +7,16 @@ Zero dependencies — just Node.js 18+ (developed on 22).
 npm start          # http://localhost:3100   (PORT=… to change)
 ```
 
-**First run:** an `admin` account is created and its one-time password is printed in the console
-(or set `ADMIN_PASSWORD` before the first start). You are forced to change it at first sign-in.
+**First run:** an administrator account is created. By default it is `admin` with a one-time password printed in
+the console, which you must change at first sign-in. To choose your own login instead (e.g. for testing), set
+`ADMIN_USERNAME` and `ADMIN_PASSWORD` (min 8 chars) before the **first** start — they only apply when `data/db.json`
+has no users yet, and are never stored in git:
+
+```
+# PowerShell
+$env:ADMIN_USERNAME="myname"; $env:ADMIN_PASSWORD="my-test-password"; npm start
+```
+
 Then add users in **Settings → Users**.
 
 ## Modules
